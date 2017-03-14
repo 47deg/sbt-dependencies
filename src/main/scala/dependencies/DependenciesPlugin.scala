@@ -1,6 +1,5 @@
 package dependencies
 
-import cats.MonadError
 import com.timushev.sbt.updates.UpdatesPlugin.autoImport._
 import com.timushev.sbt.updates.versions.Version
 import github4s.Github._
@@ -9,9 +8,6 @@ import sbt.Keys._
 import sbt._
 
 import scala.collection.immutable.SortedSet
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success, Try}
 import scalaj.http.HttpResponse
 
@@ -27,9 +23,6 @@ object DependenciesPlugin extends AutoPlugin {
       case Nil  => log.info("\nNo dependency updates found\n")
       case list => f(list)
     }
-
-  implicit val monadError: MonadError[Future, Throwable] =
-    catsStdInstancesForFuture
 
   lazy val defaultSettings = Seq(
     showDependencyUpdates := {
@@ -54,11 +47,13 @@ object DependenciesPlugin extends AutoPlugin {
           streams.value.log.info("Reading GitHub issues\n")
           githubToken.value match {
             case accessToken if accessToken.nonEmpty =>
-              val future =
-                GithubClient(githubOwner.value, githubRepo.value, accessToken)
-                  .createIssues(list, streams.value.log)
-                  .execFuture[HttpResponse[String]](Map("user-agent" -> "sbt-dependencies"))
-              Try(Await.result(future, 1.minutes)) match {
+              val client = GithubClient(githubOwner.value, githubRepo.value, accessToken)
+              val result = client
+                .createIssues(list, streams.value.log)
+                .value
+                .exec[Try, HttpResponse[String]](Map("user-agent" -> "sbt-dependencies"))
+
+              result match {
                 case Success(Right(_)) =>
                   streams.value.log.info("GitHub issues created or updated\n")
                 case Success(Left(e)) =>
@@ -68,6 +63,7 @@ object DependenciesPlugin extends AutoPlugin {
                   streams.value.log.error(s"Error creating issues")
                   e.printStackTrace()
               }
+
             case _ =>
               streams.value.log.info(
                 """
