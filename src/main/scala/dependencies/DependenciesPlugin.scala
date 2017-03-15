@@ -10,6 +10,8 @@ import sbt._
 import scala.collection.immutable.SortedSet
 import scala.util.{Failure, Success, Try}
 import scalaj.http.HttpResponse
+import cats.implicits._
+import github4s.GithubResponses.GHResult
 
 object DependenciesPlugin extends AutoPlugin {
 
@@ -49,12 +51,14 @@ object DependenciesPlugin extends AutoPlugin {
             case accessToken if accessToken.nonEmpty =>
               val client = GithubClient(githubOwner.value, githubRepo.value, accessToken)
               val result = client
-                .createIssues(list, streams.value.log)
+                .createIssues(list)
+                .run
                 .value
                 .exec[Try, HttpResponse[String]](Map("user-agent" -> "sbt-dependencies"))
 
               result match {
-                case Success(Right(_)) =>
+                case Success(Right(GHResult((logEntries: Log, _), _, _))) =>
+                  logEntries.foreach(println)
                   streams.value.log.info("GitHub issues created or updated\n")
                 case Success(Left(e)) =>
                   streams.value.log.error(s"Error creating issues")

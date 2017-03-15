@@ -1,12 +1,10 @@
 package dependencies
 
-import cats.data.{EitherT, WriterT}
 import cats.free.Free._
 import cats.implicits._
 import github4s.Github
-import github4s.GithubResponses.{GHException, GHIO, GHResult}
+import github4s.GithubResponses.GHResult
 import github4s.free.domain._
-import sbt.Logger
 
 class GithubClient(owner: String, repo: String, accessToken: String) {
 
@@ -15,29 +13,29 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
 
   private[this] val gh = Github(Some(accessToken))
 
-  def createIssues(list: List[DependencyUpdate], log: Logger): Github4sResponse[List[Issue]] = {
+  def createIssues(list: List[DependencyUpdate]): GithubOpsLog[List[Issue]] = {
 
-    def createIssueForDep(dep: DependencyUpdate,
-                          issues: Map[String, Issue],
-                          log: Logger): Github4sResponse[Issue] = {
-      log.info(s"Preparing issue for module `${dep.moduleName}`\n")
-      issues.get(dep.moduleName) match {
-        case Some(issue) =>
-          log.info(s"Found existing open issue (#${issue.number}), updating it\n")
-          updateIssue(issue, dep)
-        case None =>
-          log.info("Existing issue not found, creating a new one\n")
-          createIssue(dep)
-      }
+    def createIssueForDep(dep: DependencyUpdate, issues: Map[String, Issue]): GithubOpsLog[Issue] = {
+      for {
+        _ <- logW(s"Preparing issue for module `${dep.moduleName}`\n")
+        maybeIssue = issues.get(dep.moduleName)
+        issue <- maybeIssue.fold({
+          logW("Existing issue not found, creating a new one\n") *> createIssue(dep)
+        })({ (issue: Issue) =>
+          logW(s"Found existing open issue (#${issue.number}), updating it\n") *> updateIssue(
+            issue,
+            dep)
+        })
+      } yield issue
     }
 
     for {
-      response      <- findIssuesByModuleName()
-      createdIssues <- list.traverse(createIssueForDep(_, response.result, log))
+      issues        <- findIssuesByModuleName()
+      createdIssues <- list.traverse(createIssueForDep(_, issues))
     } yield createdIssues
   }
 
-  def findIssuesByModuleName(): Github4sResponse[Map[String, Issue]] = {
+  def findIssuesByModuleName(): GithubOpsLog[Map[String, Issue]] = {
 
     def readIssues(issues: List[Issue]): Map[String, Issue] =
       (for {
@@ -52,34 +50,36 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
                             SearchIn(Set(SearchInTitle)),
                             LabelParam(issueLabel))
 
-    EitherT(gh.issues.searchIssues(issueTitle, searchParams)).map { response =>
+    liftLog(liftResponse(gh.issues.searchIssues(issueTitle, searchParams)).map { response =>
       val map = readIssues(response.result.items)
       GHResult(map, response.statusCode, response.headers)
-    }
+    })
   }
 
-  def createIssue(dependencyUpdate: DependencyUpdate): Github4sResponse[Issue] =
-    EitherT(
-      gh.issues.createIssue(owner = owner,
-                            repo = repo,
-                            title = title(dependencyUpdate),
-                            body = body(dependencyUpdate),
-                            labels = List(issueLabel),
-                            assignees = List.empty))
+  def createIssue(dependencyUpdate: DependencyUpdate): GithubOpsLog[Issue] =
+    liftLog(
+      liftResponse(
+        gh.issues.createIssue(owner = owner,
+                              repo = repo,
+                              title = title(dependencyUpdate),
+                              body = body(dependencyUpdate),
+                              labels = List(issueLabel),
+                              assignees = List.empty)))
 
-  def updateIssue(issue: Issue, dependencyUpdate: DependencyUpdate): Github4sResponse[Issue] =
-    EitherT(
-      gh.issues.editIssue(
-        owner = owner,
-        repo = repo,
-        issue = issue.number,
-        state = "open",
-        title = title(dependencyUpdate),
-        body = body(dependencyUpdate),
-        milestone = None,
-        labels = List(issueLabel),
-        assignees = issue.assignee.toList.map(_.login)
-      ))
+  def updateIssue(issue: Issue, dependencyUpdate: DependencyUpdate): GithubOpsLog[Issue] =
+    liftLog(
+      liftResponse(
+        gh.issues.editIssue(
+          owner = owner,
+          repo = repo,
+          issue = issue.number,
+          state = "open",
+          title = title(dependencyUpdate),
+          body = body(dependencyUpdate),
+          milestone = None,
+          labels = List(issueLabel),
+          assignees = issue.assignee.toList.map(_.login)
+        )))
 
   def title(dependencyUpdate: DependencyUpdate): String =
     s"$issueTitle ${dependencyUpdate.moduleName}"
