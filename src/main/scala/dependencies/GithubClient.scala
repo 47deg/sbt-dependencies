@@ -17,14 +17,13 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
 
     def createIssueForDep(dep: DependencyUpdate, issues: Map[String, Issue]): GithubOpsLog[Issue] = {
       for {
-        _ <- logW(s"Preparing issue for module `${dep.moduleName}`\n")
+        _ <- logW(s"Preparing issue for module `${dep.moduleName}`")
         maybeIssue = issues.get(dep.moduleName)
         issue <- maybeIssue.fold({
-          logW("Existing issue not found, creating a new one\n") *> createIssue(dep)
+          logW("Existing issue not found, creating a new one") *> createIssue(dep)
         })({ (issue: Issue) =>
-          logW(s"Found existing open issue (#${issue.number}), updating it\n") *> updateIssue(
-            issue,
-            dep)
+          logW(s"Found existing open issue (#${issue.number}), updating it") *> updateIssue(issue,
+                                                                                            dep)
         })
       } yield issue
     }

@@ -58,7 +58,7 @@ object DependenciesPlugin extends AutoPlugin {
 
               result match {
                 case Success(Right(GHResult((logEntries: Log, _), _, _))) =>
-                  logEntries.foreach(println)
+                  logEntries.foreach(streams.value.log.info(_))
                   streams.value.log.info("GitHub issues created or updated\n")
                 case Success(Left(e)) =>
                   streams.value.log.error(s"Error creating issues")
