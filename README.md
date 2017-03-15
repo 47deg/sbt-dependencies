@@ -47,11 +47,15 @@ You can configure this plugin for automatically update your Issues and keep this
 
 * Create a new [GitHub token]((https://github.com/settings/tokens/new?scopes=repo&description=sbt-dependencies)) with `repo` scope
 * Create a new Environment Variable in your Travis project settings with that token (call it for example `GITHUB_TOKEN`)
+* Put this in your SBT configuration:
+```
+githubToken := Option(System.getenv().get("GITHUB_TOKEN")).getOrElse("")
+```
 * Add the follow snippet in your `.travis.yml`:
 
 ```yaml
 after_success:
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && sbt -DgithubToken=$GITHUB_TOKEN updateDependencyIssues
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && sbt updateDependencyIssues
 ```
 
 This will update all your dependency update issues after each merge into master.
