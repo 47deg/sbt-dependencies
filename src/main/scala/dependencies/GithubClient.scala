@@ -13,7 +13,7 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
 
   private[this] val gh = Github(Some(accessToken))
 
-  def createIssues(list: List[DependencyUpdate]): GithubOpsLog[List[Issue]] = {
+  def updateIssues(list: List[DependencyUpdate]): GithubOpsLog[List[Issue]] = {
 
     def createIssueForDep(dep: DependencyUpdate, issues: Map[String, Issue]): GithubOpsLog[Issue] = {
       for {
@@ -28,9 +28,25 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
       } yield issue
     }
 
+    def closeSolvedIssue(moduleAndIssue: (String, Issue)): GithubOpsLog[Issue] = {
+      val (moduleName, issue) = moduleAndIssue
+      for {
+        _     <- logW(s"Library $moduleName updated, closing issue ${issue.number}")
+        issue <- closeIssue(issue)
+      } yield issue
+    }
+
+    def closeSolvedIssues(issues: Map[String, Issue]): GithubOpsLog[List[Issue]] = {
+      val solvedIssues = issues filterNot {
+        case (moduleName, _) => list.exists(_.moduleName == moduleName)
+      }
+      solvedIssues.toList.traverse(closeSolvedIssue(_))
+    }
+
     for {
       issues        <- findIssuesByModuleName()
       createdIssues <- list.traverse(createIssueForDep(_, issues))
+      _             <- closeSolvedIssues(issues)
     } yield createdIssues
   }
 
@@ -75,6 +91,21 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
           state = "open",
           title = title(dependencyUpdate),
           body = body(dependencyUpdate),
+          milestone = None,
+          labels = List(issueLabel),
+          assignees = issue.assignee.toList.map(_.login)
+        )))
+
+  def closeIssue(issue: Issue): GithubOpsLog[Issue] =
+    liftLog(
+      liftResponse(
+        gh.issues.editIssue(
+          owner = owner,
+          repo = repo,
+          issue = issue.number,
+          state = "closed",
+          title = issue.title,
+          body = issue.body,
           milestone = None,
           labels = List(issueLabel),
           assignees = issue.assignee.toList.map(_.login)

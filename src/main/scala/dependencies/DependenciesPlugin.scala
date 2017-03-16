@@ -19,17 +19,11 @@ object DependenciesPlugin extends AutoPlugin {
 
   import DependenciesPlugin.autoImport._
 
-  def readUpdates(data: Map[ModuleID, SortedSet[Version]], log: Logger)(
-      f: (List[DependencyUpdate]) => Unit): Unit =
-    Updates.readUpdates(data) match {
-      case Nil  => log.info("\nNo dependency updates found\n")
-      case list => f(list)
-    }
-
   lazy val defaultSettings = Seq(
     showDependencyUpdates := {
-      readUpdates(dependencyUpdatesData.value, streams.value.log) {
-        list =>
+      Updates.readUpdates(dependencyUpdatesData.value) match {
+        case Nil => streams.value.log.info("\nNo dependency updates found\n")
+        case list =>
           val fullTable = List("Module", "Revision", "Patch", "Minor", "Major") +:
               list.map(
                 dep =>
@@ -44,50 +38,49 @@ object DependenciesPlugin extends AutoPlugin {
       }
     },
     updateDependencyIssues := {
-      readUpdates(dependencyUpdatesData.value, streams.value.log) {
-        list =>
-          streams.value.log.info("Reading GitHub issues\n")
-          githubToken.value match {
-            case accessToken if accessToken.nonEmpty =>
-              val client = GithubClient(githubOwner.value, githubRepo.value, accessToken)
-              val result = client
-                .createIssues(list)
-                .run
-                .value
-                .exec[Try, HttpResponse[String]](Map("user-agent" -> "sbt-dependencies"))
+      val list = Updates.readUpdates(dependencyUpdatesData.value)
+      streams.value.log.info("Reading GitHub issues\n")
+      githubToken.value match {
+        case accessToken if accessToken.nonEmpty =>
+          val client =
+            GithubClient(githubOwner.value, githubRepo.value, accessToken)
+          val result = client
+            .updateIssues(list)
+            .run
+            .value
+            .exec[Try, HttpResponse[String]](Map("user-agent" -> "sbt-dependencies"))
 
-              result match {
-                case Success(Right(GHResult((logEntries: Log, _), _, _))) =>
-                  logEntries.foreach(streams.value.log.info(_))
-                  streams.value.log.info("GitHub issues created or updated\n")
-                case Success(Left(e)) =>
-                  streams.value.log.error(s"Error creating issues")
-                  e.printStackTrace()
-                case Failure(e) =>
-                  streams.value.log.error(s"Error creating issues")
-                  e.printStackTrace()
-              }
-
-            case _ =>
-              streams.value.log.info(
-                """
-                  | Can't read the access token, please set the GitHub token with the SBT setting key 'githubToken'
-                  |
-                  | For ex:
-                  |
-                  |  // build.sbt
-                  |  githubToken := sys.props.get("githubToken").getOrElse("")
-                  |
-                  |  // Command line
-                  |  `sbt -DgithubToken=XXXXXX`
-                  |
-                  | You need to create a token in this page with the `repo` scope:
-                  |  * https://github.com/settings/tokens/new?scopes=repo&description=sbt-dependencies
-                  |
-                  | """.stripMargin)
+          result match {
+            case Success(Right(GHResult((logEntries: Log, _), _, _))) =>
+              logEntries.foreach(streams.value.log.info(_))
+              streams.value.log.info("GitHub issues created or updated\n")
+            case Success(Left(e)) =>
+              streams.value.log.error(s"Error updating issues")
+              e.printStackTrace()
+            case Failure(e) =>
+              streams.value.log.error(s"Error updating issues")
+              e.printStackTrace()
           }
 
+        case _ =>
+          streams.value.log.info(
+            """
+              | Can't read the access token, please set the GitHub token with the SBT setting key 'githubToken'
+              |
+              | For ex:
+              |
+              |  // build.sbt
+              |  githubToken := sys.props.get("githubToken").getOrElse("")
+              |
+              |  // Command line
+              |  `sbt -DgithubToken=XXXXXX`
+              |
+              | You need to create a token in this page with the `repo` scope:
+              |  * https://github.com/settings/tokens/new?scopes=repo&description=sbt-dependencies
+              |
+              | """.stripMargin)
       }
+
     },
     dependencyUpdatesExclusions := moduleFilter(organization = "org.scala-lang"),
     githubToken := ""
