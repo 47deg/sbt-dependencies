@@ -29,7 +29,7 @@ lazy val pluginSettings = Seq(
       "jgit-repo" at "http://download.eclipse.org/jgit/maven"
     ),
     libraryDependencies ++= Seq(
-      dep("github4s"),
+      "com.47deg"       %% "github4s" % "0.11.1-SNAPSHOT",
       dep("scalatest")  % "test",
       dep("scalacheck") % "test"
     ),
