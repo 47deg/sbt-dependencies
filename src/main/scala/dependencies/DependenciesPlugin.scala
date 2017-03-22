@@ -25,16 +25,18 @@ object DependenciesPlugin extends AutoPlugin {
         case Nil => streams.value.log.info("\nNo dependency updates found\n")
         case list =>
           val fullTable = List("Module", "Revision", "Patch", "Minor", "Major") +:
-              list.map(
-                dep =>
-                  List(dep.moduleName,
-                       dep.revision,
-                       dep.patch.getOrElse(""),
-                       dep.minor.getOrElse(""),
-                       dep.major.getOrElse("")))
+            list.map(
+            dep =>
+              List(
+                dep.moduleName,
+                dep.revision,
+                dep.patch.getOrElse(""),
+                dep.minor.getOrElse(""),
+                dep.major.getOrElse("")))
           streams.value.log.info("\nFound some dependency updates:\n")
           streams.value.log.info(TablePrinter.format(fullTable))
-          streams.value.log.info("Execute `updateDependencyIssues` to update your issues\n")
+          streams.value.log
+            .info("Execute `updateDependencyIssues` to update your issues\n")
       }
     },
     updateDependencyIssues := {

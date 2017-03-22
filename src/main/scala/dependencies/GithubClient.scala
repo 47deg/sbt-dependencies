@@ -22,8 +22,9 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
         issue <- maybeIssue.fold({
           logW("Existing issue not found, creating a new one") *> createIssue(dep)
         })({ (issue: Issue) =>
-          logW(s"Found existing open issue (#${issue.number}), updating it") *> updateIssue(issue,
-                                                                                            dep)
+          logW(s"Found existing open issue (#${issue.number}), updating it") *> updateIssue(
+            issue,
+            dep)
         })
       } yield issue
     }
@@ -59,11 +60,12 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
         moduleName = issue.title.substring(issueTitle.length + 1)
       } yield moduleName -> issue).toMap
 
-    val searchParams = List(OwnerParamInRepository(s"$owner/$repo"),
-                            IssueTypeIssue,
-                            IssueStateOpen,
-                            SearchIn(Set(SearchInTitle)),
-                            LabelParam(issueLabel))
+    val searchParams = List(
+      OwnerParamInRepository(s"$owner/$repo"),
+      IssueTypeIssue,
+      IssueStateOpen,
+      SearchIn(Set(SearchInTitle)),
+      LabelParam(issueLabel))
 
     liftLog(liftResponse(gh.issues.searchIssues(issueTitle, searchParams)).map { response =>
       val map = readIssues(response.result.items)
@@ -74,12 +76,13 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
   def createIssue(dependencyUpdate: DependencyUpdate): GithubOpsLog[Issue] =
     liftLog(
       liftResponse(
-        gh.issues.createIssue(owner = owner,
-                              repo = repo,
-                              title = title(dependencyUpdate),
-                              body = body(dependencyUpdate),
-                              labels = List(issueLabel),
-                              assignees = List.empty)))
+        gh.issues.createIssue(
+          owner = owner,
+          repo = repo,
+          title = title(dependencyUpdate),
+          body = body(dependencyUpdate),
+          labels = List(issueLabel),
+          assignees = List.empty)))
 
   def updateIssue(issue: Issue, dependencyUpdate: DependencyUpdate): GithubOpsLog[Issue] =
     liftLog(

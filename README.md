@@ -11,7 +11,7 @@ This plugin depends on the [`sbt-updates`](https://github.com/rtimush/sbt-update
 Add the following line to `project/plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.47deg" % "sbt-dependencies" % "0.0.3")
+addSbtPlugin("com.47deg" % "sbt-dependencies" % "0.0.4")
 ```
 
 ## Configuration

@@ -20,10 +20,10 @@ object TablePrinter {
   def formatRows(rowSeparator: String, rows: List[String]): String =
     (rowSeparator ::
       rows.head ::
-        rowSeparator ::
-          rows.tail :::
-            rowSeparator ::
-              List()).mkString("\n")
+      rowSeparator ::
+      rows.tail :::
+      rowSeparator ::
+      List()).mkString("\n")
 
   def formatRow(row: List[String], colSizes: List[Int], header: Boolean): String = {
     val cells = row.zip(colSizes) map {
@@ -33,6 +33,7 @@ object TablePrinter {
     cells.mkString("|", "|", "|")
   }
 
-  def rowSeparator(colSizes: List[Int]): String = colSizes map { "-" * _ } mkString ("+", "+", "+")
+  def rowSeparator(colSizes: List[Int]): String =
+    colSizes map { "-" * _ } mkString ("+", "+", "+")
 
 }
