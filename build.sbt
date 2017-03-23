@@ -8,11 +8,8 @@ lazy val pluginSettings = Seq(
   scalaVersion := "2.10.6",
   crossScalaVersions := Seq("2.10.6"),
   scalaOrganization := "org.scala-lang",
-  libraryDependencies ++= Seq(
-    %%("github4s"),
-    %%("scalatest")  % "test",
-    %%("scalacheck") % "test"
-  ),
+  githubToken := getEnvVar("GITHUB_TOKEN").getOrElse(""),
+  libraryDependencies ++= Seq(%%("github4s")),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0"),
   addSbtPlugin(

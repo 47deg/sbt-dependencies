@@ -4,3 +4,5 @@ project/target/
 target/
 deploy_key
 secring.gpg
+travis-deploy-key
+keys.tar

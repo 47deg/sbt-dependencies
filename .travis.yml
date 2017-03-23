@@ -4,8 +4,14 @@ scala:
 jdk:
   - oraclejdk8
 before_install:
-  - openssl aes-256-cbc -K $encrypted_5cd1f76c4e65_key -iv $encrypted_5cd1f76c4e65_iv -in secring.gpg.enc -out secring.gpg -d
+- if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then bash
+  scripts/decrypt-keys.sh; fi
 script:
   - sbt ++$TRAVIS_SCALA_VERSION clean compile
 after_success:
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && sbt compile publishSigned
+- if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
+    sbt ++$TRAVIS_SCALA_VERSION orgCreateContributorsFile;
+    sbt ++$TRAVIS_SCALA_VERSION orgCreateFiles;
+    bash scripts/commit-changes.sh;
+    sbt ++$TRAVIS_SCALA_VERSION publishSigned;
+  fi
