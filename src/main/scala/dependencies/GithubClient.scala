@@ -5,13 +5,14 @@ import cats.implicits._
 import github4s.Github
 import github4s.GithubResponses.GHResult
 import github4s.free.domain._
+import sbtorgpolicies.github.instances._
 
-class GithubClient(owner: String, repo: String, accessToken: String) {
+class GithubClient(owner: String, repo: String, accessToken: Option[String]) {
 
   val issueTitle = "Update dependency"
   val issueLabel = "update-dependencies"
 
-  private[this] val gh = Github(Some(accessToken))
+  private[this] val gh = Github(accessToken)
 
   def updateIssues(list: List[DependencyUpdate]): GithubOpsLog[List[Issue]] = {
 
@@ -129,7 +130,7 @@ class GithubClient(owner: String, repo: String, accessToken: String) {
 
 object GithubClient {
 
-  def apply(owner: String, repo: String, accessToken: String): GithubClient =
+  def apply(owner: String, repo: String, accessToken: Option[String]): GithubClient =
     new GithubClient(owner, repo, accessToken)
 
 }

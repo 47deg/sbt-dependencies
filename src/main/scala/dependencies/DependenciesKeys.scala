@@ -11,7 +11,7 @@ trait DependenciesKeys {
 
   val githubOwner: SettingKey[String] = settingKey[String]("GitHub owner")
   val githubRepo: SettingKey[String]  = settingKey[String]("GitHub repo")
-  val githubToken: SettingKey[String] =
-    settingKey[String]("GitHub token with repo scope")
+  val githubToken: SettingKey[Option[String]] =
+    settingKey[Option[String]]("GitHub token with repo scope")
 
 }
