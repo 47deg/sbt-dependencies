@@ -22,7 +22,6 @@ import github4s.GithubResponses.GHResult
 import github4s.jvm.Implicits._
 import sbt.Keys._
 import sbt._
-import sbtorgpolicies.OrgPoliciesPlugin
 import sbtorgpolicies.github.instances._
 
 import scala.util.{Failure, Success, Try}
@@ -30,14 +29,12 @@ import scalaj.http.HttpResponse
 
 object DependenciesPlugin extends AutoPlugin {
 
-  override def requires: Plugins = OrgPoliciesPlugin
-
   object autoImport extends DependenciesKeys
 
   import DependenciesPlugin.autoImport._
 
   lazy val defaultSettings = Seq(
-    showDependencyUpdates := {
+    depShowDependencyUpdates := {
       Updates.readUpdates(dependencyUpdatesData.value) match {
         case Nil => streams.value.log.info("\nNo dependency updates found\n")
         case list =>
@@ -56,12 +53,15 @@ object DependenciesPlugin extends AutoPlugin {
             .info("Execute `updateDependencyIssues` to update your issues\n")
       }
     },
-    updateDependencyIssues := {
+    depUpdateDependencyIssues := {
       val list = Updates.readUpdates(dependencyUpdatesData.value)
       streams.value.log.info("Reading GitHub issues\n")
-      if (githubToken.value.isDefined) {
+      if (depGithubTokenSetting.value.isDefined) {
         val client =
-          GithubClient(githubOwner.value, githubRepo.value, githubToken.value)
+          GithubClient(
+            depGithubOwnerSetting.value,
+            depGithubRepoSetting.value,
+            depGithubTokenSetting.value)
         val result = client
           .updateIssues(list)
           .run
@@ -87,7 +87,7 @@ object DependenciesPlugin extends AutoPlugin {
             | For ex:
             |
             |  // build.sbt (default behaviour)
-            |  githubToken := Option(System.getenv().get("GITHUB_TOKEN"))
+            |  depGithubTokenSetting := Option(System.getenv().get("GITHUB_TOKEN"))
             |
             |  // Command line
             |  `env GITHUB_TOKEN=XXXXX sbt`
@@ -100,7 +100,7 @@ object DependenciesPlugin extends AutoPlugin {
 
     },
     dependencyUpdatesExclusions := moduleFilter(organization = "org.scala-lang"),
-    githubToken := Option(System.getenv().get("GITHUB_TOKEN"))
+    depGithubTokenSetting := Option(System.getenv().get("GITHUB_TOKEN"))
   )
 
   override val projectSettings: Seq[Setting[_]] = defaultSettings
