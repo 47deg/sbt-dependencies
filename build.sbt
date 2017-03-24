@@ -12,13 +12,13 @@ lazy val pluginSettings = Seq(
   scalaOrganization := "org.scala-lang",
   githubToken := getEnvVar("GITHUB_TOKEN"),
   orgMaintainersSettings := List(Dev("fedefernandez", Some("Fede Fernández"))),
-  libraryDependencies ++= Seq(%%("github4s")),
   resolvers += Resolver.sonatypeRepo("snapshots"),
-  addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0"),
-  addSbtPlugin(
-    "com.47deg" % "sbt-org-policies" % "0.2.2-SNAPSHOT" % "compile"
+  libraryDependencies ++= Seq(
+    %%("github4s"),
+    "com.47deg" % "org-policies-core" % "0.2.2-SNAPSHOT" % "compile"
       exclude ("com.47deg", "sbt-dependencies")
-      exclude ("com.47deg", "sbt-microsites"))
+      exclude ("com.47deg", "sbt-microsites")),
+  addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0")
 )
 
 lazy val `sbt-dependencies` = (project in file("."))
