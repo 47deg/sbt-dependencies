@@ -1,3 +1,5 @@
+import sbtorgpolicies.model.Dev
+
 pgpPassphrase := Some(getEnvVar("PGP_PASSPHRASE").getOrElse("").toCharArray)
 pgpPublicRing := file(s"$gpgFolder/pubring.gpg")
 pgpSecretRing := file(s"$gpgFolder/secring.gpg")
@@ -9,6 +11,7 @@ lazy val pluginSettings = Seq(
   crossScalaVersions := Seq("2.10.6"),
   scalaOrganization := "org.scala-lang",
   githubToken := getEnvVar("GITHUB_TOKEN").getOrElse(""),
+  orgMaintainersSettings := List(Dev("fedefernandez", Some("Fede Fernández"))),
   libraryDependencies ++= Seq(%%("github4s")),
   resolvers += Resolver.sonatypeRepo("snapshots"),
   addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.0"),
