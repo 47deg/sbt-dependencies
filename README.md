@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/47deg/sbt-dependencies.svg?branch=master)](https://travis-ci.org/47deg/sbt-dependencies)
 
-# sbt-dependencies
+# sbt-dependencies
 
 **sbt-dependencies** is an SBT plugin that allows to keep your project dependencies up-to-date.
 
@@ -14,7 +14,7 @@ Add the following line to `project/plugins.sbt`:
 addSbtPlugin("com.47deg" % "sbt-dependencies" % "0.0.4")
 ```
 
-## Configuration
+## Configuration
 
 **SBT Configuration**
 
@@ -36,7 +36,7 @@ And launch SBT passing the property:
 $ sbt -DgithubToken=XXXXXX
 ```
 
-## SBT Tasks
+## SBT Tasks
 
 * `showDependencyUpdates`: Shows the dependency updates
 * `updateDependencyIssues`: Iterates over each dependency update and creates a new GitHub Issue for that dependency. If there is already an open issue for that dependency just updates it. The body of the issue contains the `patch`, `minor` and `major` versions available for that library.
