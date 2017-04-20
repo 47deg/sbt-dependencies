@@ -99,7 +99,9 @@ object DependenciesPlugin extends AutoPlugin {
       }
 
     },
-    dependencyUpdatesExclusions := moduleFilter(organization = "org.scala-lang"),
+    dependencyUpdatesExclusions :=
+      moduleFilter("org.scala-sbt", "sbt-launch") |
+        moduleFilter("org.scala-lang"),
     depGithubTokenSetting := Option(System.getenv().get("GITHUB_TOKEN"))
   )
 

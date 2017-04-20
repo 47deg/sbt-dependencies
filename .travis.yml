@@ -4,14 +4,18 @@ scala:
 jdk:
   - oraclejdk8
 before_install:
-- if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then bash
-  scripts/decrypt-keys.sh; fi
+  - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
+    bash scripts/decrypt-keys.sh; fi
+  - export PATH=${PATH}:./vendor/bundle
+install:
+  - rvm use 2.2.3 --install --fuzzy
+  - gem update --system
+  - gem install sass
+  - gem install jekyll -v 3.2.1
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean compile
+  - sbt ++$TRAVIS_SCALA_VERSION orgScriptCI
+  - sbt ++$TRAVIS_SCALA_VERSION 'docs/tut'
 after_success:
-- if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
-    sbt ++$TRAVIS_SCALA_VERSION orgCreateContributorsFile;
-    sbt ++$TRAVIS_SCALA_VERSION orgCreateFiles;
-    bash scripts/commit-changes.sh;
-    sbt ++$TRAVIS_SCALA_VERSION publishSigned;
-  fi
+  - sbt ++$TRAVIS_SCALA_VERSION orgAfterCISuccess
+  - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
+    bash scripts/publishMicrosite.sh; fi

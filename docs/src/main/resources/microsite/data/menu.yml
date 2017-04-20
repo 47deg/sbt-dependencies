@@ -1,0 +1,9 @@
+options:
+  - title: Getting Started
+    url: docs/index.html
+
+  - title: Configuring the Plugin
+    url: docs/settings.html
+
+  - title: Integrates with Travis
+    url: docs/integrates-with-travis.html
