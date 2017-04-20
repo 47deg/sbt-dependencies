@@ -15,8 +15,7 @@ lazy val pluginSettings = Seq(
   orgMaintainersSetting := List(Dev("fedefernandez", Some("Fede Fernández"))),
   orgScriptTaskListSetting := List(
     orgValidateFiles.toOrgTask,
-    orgCheckSettings.toOrgTask,
-    (orgCompile in ThisBuild).toOrgTask(allModulesScope = true, crossScalaVersionsScope = true)
+    (orgCompile in ThisBuild).toOrgTask(allModulesScope = true, crossScalaVersionsScope = false)
   ),
   libraryDependencies ++= Seq(
     %%("github4s"),
