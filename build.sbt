@@ -51,6 +51,7 @@ lazy val `sbt-dependencies` = (project in file("."))
 
 lazy val docs = (project in file("docs"))
   .settings(moduleName := "docs")
+  .settings(scalaOrganization := "org.scala-lang")
   .settings(micrositeSettings: _*)
   .settings(noPublishSettings: _*)
   .enablePlugins(MicrositesPlugin)

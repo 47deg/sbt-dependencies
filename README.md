@@ -12,3 +12,7 @@ addSbtPlugin("com.47deg" % "sbt-dependencies" % "0.1.0")
 ```
 
 [comment]: # (End Replace)
+
+## sbt-dependencies in the wild
+
+If you wish to add your library here please consider a PR to include it.
