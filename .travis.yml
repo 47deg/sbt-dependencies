@@ -18,4 +18,4 @@ script:
 after_success:
   - sbt ++$TRAVIS_SCALA_VERSION orgAfterCISuccess
   - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
-    bash scripts/publishMicrosite.sh; fi
+    bash scripts/publish-microsite.sh; fi
