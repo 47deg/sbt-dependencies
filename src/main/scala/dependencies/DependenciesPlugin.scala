@@ -56,50 +56,51 @@ object DependenciesPlugin extends AutoPlugin {
     depUpdateDependencyIssues := {
       val list = Updates.readUpdates(dependencyUpdatesData.value)
       streams.value.log.info("Reading GitHub issues\n")
-      if (depGithubTokenSetting.value.isDefined) {
-        val client =
-          GithubClient(
-            depGithubOwnerSetting.value,
-            depGithubRepoSetting.value,
-            depGithubTokenSetting.value)
-        val result = client
-          .updateIssues(list)
-          .run
-          .value
-          .exec[Try, HttpResponse[String]](Map("user-agent" -> "sbt-dependencies"))
+      depGithubTokenSetting.value.isDefined match {
+        case true =>
+          val client =
+            GithubClient(
+              depGithubOwnerSetting.value,
+              depGithubRepoSetting.value,
+              depGithubTokenSetting.value)
+          val result = client
+            .updateIssues(list)
+            .run
+            .value
+            .exec[Try, HttpResponse[String]](Map("user-agent" -> "sbt-dependencies"))
 
-        result match {
-          case Success(Right(GHResult((logEntries: Log, _), _, _))) =>
-            logEntries.foreach(streams.value.log.info(_))
-            streams.value.log.info("GitHub issues created or updated\n")
-          case Success(Left(e)) =>
-            streams.value.log.error(s"Error updating issues")
-            e.printStackTrace()
-          case Failure(e) =>
-            streams.value.log.error(s"Unexpected error updating issues")
-            e.printStackTrace()
-        }
-      } else {
-        streams.value.log.info(
-          """
-            | Can't read the access token, please set the GitHub token with the SBT setting key 'githubToken'
-            |
-            | For ex:
-            |
-            |  // build.sbt (default behaviour)
-            |  depGithubTokenSetting := Option(System.getenv().get("GITHUB_TOKEN"))
-            |
-            |  // Command line
-            |  `env GITHUB_TOKEN=XXXXX sbt`
-            |
-            | You would need to create a token in this page with the `repo` scope:
-            |  * https://github.com/settings/tokens/new?scopes=repo&description=sbt-dependencies
-            |
-            | """.stripMargin)
+          result match {
+            case Success(Right(GHResult((logEntries: Log, _), _, _))) =>
+              logEntries.foreach(streams.value.log.info(_))
+              streams.value.log.info("GitHub issues created or updated\n")
+            case Success(Left(e)) =>
+              streams.value.log.error(s"Error updating issues")
+              e.printStackTrace()
+            case Failure(e) =>
+              streams.value.log.error(s"Unexpected error updating issues")
+              e.printStackTrace()
+          }
+
+        case false =>
+          streams.value.log.info(
+            """
+              | Can't read the access token, please set the GitHub token with the SBT setting key 'githubToken'
+              |
+              | For ex:
+              |
+              |  // build.sbt (default behaviour)
+              |  depGithubTokenSetting := Option(System.getenv().get("GITHUB_TOKEN"))
+              |
+              |  // Command line
+              |  `env GITHUB_TOKEN=XXXXX sbt`
+              |
+              | You would need to create a token in this page with the `repo` scope:
+              |  * https://github.com/settings/tokens/new?scopes=repo&description=sbt-dependencies
+              |
+              | """.stripMargin)
       }
-
     },
-    dependencyUpdatesExclusions :=
+    dependencyUpdatesFilter -=
       moduleFilter("org.scala-sbt", "sbt-launch") |
         moduleFilter("org.scala-lang"),
     depGithubTokenSetting := Option(System.getenv().get("GITHUB_TOKEN"))
