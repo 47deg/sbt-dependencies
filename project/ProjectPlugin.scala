@@ -19,10 +19,8 @@ object ProjectPlugin extends AutoPlugin {
 
     lazy val pluginSettings = Seq(
       sbtPlugin := true,
-      libraryDependencies ++= Seq(
-        %%("github4s"),
-        "com.47deg" %% "org-policies-core" % "0.6.0-SNAPSHOT"),
-      addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.1")
+      libraryDependencies ++= Seq(%%("github4s"), "com.47deg" %% "org-policies-core" % "0.6.2"),
+      addSbtPlugin("com.timushev.sbt"                         % "sbt-updates"        % "0.3.1")
     )
 
     // lazy val micrositeSettings = Seq(
@@ -58,11 +56,6 @@ object ProjectPlugin extends AutoPlugin {
       startYear := Option(2017),
       orgGithubTokenSetting := "GITHUB_TOKEN",
       orgMaintainersSetting := List(Dev("fedefernandez", Some("Fede Fernández"))),
-      orgScriptTaskListSetting := List(
-        orgValidateFiles.asRunnableItem,
-        (compile in Compile).asRunnableItem,
-        // (tut in ProjectRef(file("."), "docs")).asRunnableItem
-      ),
       orgBadgeListSetting := List(
         TravisBadge.apply(_),
         MavenCentralBadge.apply(_),

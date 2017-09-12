@@ -32,7 +32,9 @@ class GithubClient(owner: String, repo: String, accessToken: Option[String]) {
 
   def updateIssues(list: List[DependencyUpdate]): GithubOpsLog[List[Issue]] = {
 
-    def createIssueForDep(dep: DependencyUpdate, issues: Map[String, Issue]): GithubOpsLog[Issue] = {
+    def createIssueForDep(
+        dep: DependencyUpdate,
+        issues: Map[String, Issue]): GithubOpsLog[Issue] = {
       for {
         _ <- logW(s"Preparing issue for module `${dep.moduleName}`")
         maybeIssue = issues.get(dep.moduleName)
