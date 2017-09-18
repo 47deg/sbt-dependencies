@@ -8,6 +8,6 @@ lazy val `sbt-dependencies` = (project in file("."))
 
 lazy val docs = (project in file("docs"))
   .settings(moduleName := "docs")
-  // .settings(micrositeSettings: _*)
+  .settings(micrositeSettings: _*)
   .settings(noPublishSettings: _*)
-// .enablePlugins(MicrositesPlugin)
+  .enablePlugins(MicrositesPlugin)
