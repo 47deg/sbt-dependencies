@@ -27,6 +27,8 @@ object ProjectPlugin extends AutoPlugin {
       micrositeDescription := "An SBT plugin that allows to you to keep your project dependencies up-to-date",
       micrositeBaseUrl := "sbt-dependencies",
       micrositeDocumentationUrl := "/sbt-dependencies/docs/",
+      micrositePushSiteWith := GitHub4s,
+      micrositeGithubToken := getEnvVar("GITHUB_TOKEN"),
       micrositeGithubOwner := "47deg",
       micrositeGithubRepo := "sbt-dependencies",
       micrositeHighlightTheme := "darcula",
