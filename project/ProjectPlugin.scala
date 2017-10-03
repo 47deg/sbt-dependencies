@@ -1,11 +1,10 @@
 import com.typesafe.sbt.site.SitePlugin.autoImport._
-import microsites.MicrositeKeys._
+import microsites.MicrositesPlugin.autoImport._
 import sbt.Keys._
 import sbt._
 import sbtorgpolicies.OrgPoliciesPlugin
 import sbtorgpolicies.OrgPoliciesPlugin.autoImport._
 import sbtorgpolicies.model._
-import sbtorgpolicies.runnable.syntax._
 import sbtorgpolicies.templates.badges._
 
 object ProjectPlugin extends AutoPlugin {
@@ -49,7 +48,7 @@ object ProjectPlugin extends AutoPlugin {
     Seq(
       name := "sbt-dependencies",
       scalaVersion := scalac.`2.12`,
-      crossScalaVersions := Seq(scalac.`2.12`),
+      crossScalaVersions := "2.10.6" :: scalac.crossScalaVersions,
       crossSbtVersions := Seq(sbtV.`0.13`, sbtV.`1.0`),
       scalaOrganization := "org.scala-lang",
       startYear := Option(2017),
@@ -61,5 +60,5 @@ object ProjectPlugin extends AutoPlugin {
         LicenseBadge.apply(_),
         GitHubIssuesBadge.apply(_)
       )
-    ) ++ shellPromptSettings
+    ) ++ orgDefaultSettings ++ shellPromptSettings
 }
