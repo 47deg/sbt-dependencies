@@ -17,7 +17,7 @@ object ProjectPlugin extends AutoPlugin {
 
     lazy val pluginSettings = Seq(
       sbtPlugin := true,
-      libraryDependencies ++= Seq(%%("github4s", "0.16.0"), %%("org-policies-core")),
+      libraryDependencies ++= Seq(%%("github4s"), %%("org-policies-core")),
       addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.1")
     )
 
