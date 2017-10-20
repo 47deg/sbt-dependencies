@@ -1,4 +1,4 @@
-addSbtPlugin("com.47deg" % "sbt-org-policies" % "0.8.1")
+addSbtPlugin("com.47deg" % "sbt-org-policies" % "0.8.3")
 libraryDependencies += {
   lazy val sbtVersionValue = (sbtVersion in pluginCrossBuild).value
 
