@@ -17,7 +17,10 @@ object ProjectPlugin extends AutoPlugin {
 
     lazy val pluginSettings = Seq(
       sbtPlugin := true,
-      libraryDependencies ++= Seq(%%("github4s"), %%("org-policies-core")),
+      scalaVersion := scalac.`2.12`,
+      crossScalaVersions := Seq(scalac.`2.12`),
+      crossSbtVersions := Seq(sbtV.`0.13`, sbtV.`1.0`),
+      libraryDependencies ++= Seq(%%("github4s"), %%("org-policies-core", "0.8.3")),
       addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.1")
     )
 
@@ -47,9 +50,6 @@ object ProjectPlugin extends AutoPlugin {
   override def projectSettings: Seq[Def.Setting[_]] =
     Seq(
       name := "sbt-dependencies",
-      scalaVersion := scalac.`2.12`,
-      crossScalaVersions := "2.10.6" :: scalac.crossScalaVersions,
-      crossSbtVersions := Seq(sbtV.`0.13`, sbtV.`1.0`),
       scalaOrganization := "org.scala-lang",
       startYear := Option(2017),
       orgGithubTokenSetting := "GITHUB_TOKEN",
