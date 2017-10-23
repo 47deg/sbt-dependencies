@@ -52,7 +52,6 @@ object ProjectPlugin extends AutoPlugin {
       name := "sbt-dependencies",
       scalaOrganization := "org.scala-lang",
       startYear := Option(2017),
-      orgGithubTokenSetting := "GITHUB_TOKEN",
       orgMaintainersSetting := List(Dev("fedefernandez", Some("Fede Fernández"))),
       orgBadgeListSetting := List(
         TravisBadge.apply(_),

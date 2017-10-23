@@ -26,7 +26,6 @@ install:
 
 script:
   - sbt ++$TRAVIS_SCALA_VERSION ^^$SBT_VERSION clean compile test
-  - sbt ++$TRAVIS_SCALA_VERSION ^^$SBT_VERSION scripted;
 
 after_success:
   - if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
