@@ -21,7 +21,7 @@ object ProjectPlugin extends AutoPlugin {
       crossScalaVersions := Seq(scalac.`2.12`),
       crossSbtVersions := Seq(sbtV.`0.13`, sbtV.`1.0`),
       libraryDependencies ++= Seq(%%("github4s"), %%("org-policies-core", "0.8.3")),
-      addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.1")
+      addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.3")
     )
 
     lazy val micrositeSettings = Seq(
