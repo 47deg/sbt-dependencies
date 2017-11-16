@@ -20,7 +20,7 @@ object ProjectPlugin extends AutoPlugin {
       scalaVersion := scalac.`2.12`,
       crossScalaVersions := Seq(scalac.`2.12`),
       crossSbtVersions := Seq(sbtV.`0.13`, sbtV.`1.0`),
-      libraryDependencies ++= Seq(%%("github4s", "0.15.0"), %%("org-policies-core", "0.8.12")),
+      libraryDependencies ++= Seq(%%("github4s", "0.15.0"), %%("org-policies-core", "0.8.14")),
       addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.3.3")
     )
 
