@@ -86,7 +86,7 @@ class GithubClient(owner: String, repo: String, accessToken: Option[String]) {
       SearchIn(Set(SearchInTitle)),
       LabelParam(issueLabel))
 
-    liftLog(liftResponse(gh.issues.searchIssues(issueTitle, searchParams)).map { response =>
+    liftLog(liftResponse(gh.issues.searchIssues("", searchParams)).map { response =>
       val map = readIssues(response.result.items)
       GHResult(map, response.statusCode, response.headers)
     })
