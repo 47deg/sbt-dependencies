@@ -5,7 +5,7 @@ title: Getting Started
 
 # Prerequisites
 
-* [sbt](http://www.scala-sbt.org/) 0.13.8+
+* [sbt](http://www.scala-sbt.org/) 1.+
 
 # Configure the plugin
 
