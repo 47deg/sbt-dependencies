@@ -28,8 +28,8 @@ The plugin provides a basic functionality for tracking the dependency updates.
 This plugin directly uses the following plugins and libraries:
 
 * [sbt-updates](https://github.com/rtimush/sbt-updates)
-* [github4s](https://github.com/47deg/github4s)
+* [github4s](https://github.com/47degrees/github4s)
 
 Additionally, it depends on other useful libraries and plugins like:
 
-* [sbt-org-policies](https://github.com/47deg/sbt-org-policies)
+* [sbt-org-policies](https://github.com/47degrees/sbt-org-policies)

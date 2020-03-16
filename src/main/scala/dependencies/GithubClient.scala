@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 47 Degrees, LLC. <http://www.47deg.com>
+ * Copyright 2017-2020 47 Degrees, LLC. <http://www.47deg.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,8 @@ class GithubClient(owner: String, repo: String, accessToken: Option[String]) {
 
     def createIssueForDep(
         dep: DependencyUpdate,
-        issues: Map[String, Issue]): GithubOpsLog[Issue] = {
+        issues: Map[String, Issue]
+    ): GithubOpsLog[Issue] = {
       for {
         _ <- logW(s"Preparing issue for module `${dep.moduleName}`")
         maybeIssue = issues.get(dep.moduleName)
@@ -43,7 +44,8 @@ class GithubClient(owner: String, repo: String, accessToken: Option[String]) {
         })({ (issue: Issue) =>
           logW(s"Found existing open issue (#${issue.number}), updating it") *> updateIssue(
             issue,
-            dep)
+            dep
+          )
         })
       } yield issue
     }
@@ -84,7 +86,8 @@ class GithubClient(owner: String, repo: String, accessToken: Option[String]) {
       IssueTypeIssue,
       IssueStateOpen,
       SearchIn(Set(SearchInTitle)),
-      LabelParam(issueLabel))
+      LabelParam(issueLabel)
+    )
 
     liftLog(liftResponse(gh.issues.searchIssues("", searchParams)).map { response =>
       val map = readIssues(response.result.items)
@@ -101,7 +104,10 @@ class GithubClient(owner: String, repo: String, accessToken: Option[String]) {
           title = title(dependencyUpdate),
           body = body(dependencyUpdate),
           labels = List(issueLabel),
-          assignees = List.empty)))
+          assignees = List.empty
+        )
+      )
+    )
 
   def updateIssue(issue: Issue, dependencyUpdate: DependencyUpdate): GithubOpsLog[Issue] =
     liftLog(
@@ -116,7 +122,9 @@ class GithubClient(owner: String, repo: String, accessToken: Option[String]) {
           milestone = None,
           labels = List(issueLabel),
           assignees = issue.assignee.toList.map(_.login)
-        )))
+        )
+      )
+    )
 
   def closeIssue(issue: Issue): GithubOpsLog[Issue] =
     liftLog(
@@ -131,7 +139,9 @@ class GithubClient(owner: String, repo: String, accessToken: Option[String]) {
           milestone = None,
           labels = List(issueLabel),
           assignees = issue.assignee.toList.map(_.login)
-        )))
+        )
+      )
+    )
 
   def title(dependencyUpdate: DependencyUpdate): String =
     s"$issueTitle ${dependencyUpdate.moduleName}"

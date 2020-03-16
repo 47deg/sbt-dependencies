@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 47 Degrees, LLC. <http://www.47deg.com>
+ * Copyright 2017-2020 47 Degrees, LLC. <http://www.47deg.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,14 +39,15 @@ object DependenciesPlugin extends AutoPlugin {
         case Nil => streams.value.log.info("\nNo dependency updates found\n")
         case list =>
           val fullTable = List("Module", "Revision", "Patch", "Minor", "Major") +:
-            list.map(
-            dep =>
+            list.map(dep =>
               List(
                 dep.moduleName,
                 dep.revision,
                 dep.patch.getOrElse(""),
                 dep.minor.getOrElse(""),
-                dep.major.getOrElse("")))
+                dep.major.getOrElse("")
+              )
+            )
           streams.value.log.info("\nFound some dependency updates:\n")
           streams.value.log.info(TablePrinter.format(fullTable))
           streams.value.log
@@ -62,7 +63,8 @@ object DependenciesPlugin extends AutoPlugin {
             GithubClient(
               depGithubOwnerSetting.value,
               depGithubRepoSetting.value,
-              depGithubTokenSetting.value)
+              depGithubTokenSetting.value
+            )
           val result = client
             .updateIssues(list)
             .run
@@ -97,7 +99,8 @@ object DependenciesPlugin extends AutoPlugin {
               | You would need to create a token in this page with the `repo` scope:
               |  * https://github.com/settings/tokens/new?scopes=repo&description=sbt-dependencies
               |
-              | """.stripMargin)
+              | """.stripMargin
+          )
       }
     },
     dependencyUpdatesFilter -=

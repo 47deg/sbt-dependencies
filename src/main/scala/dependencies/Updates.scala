@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 47 Degrees, LLC. <http://www.47deg.com>
+ * Copyright 2017-2020 47 Degrees, LLC. <http://www.47deg.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,19 +29,13 @@ object Updates {
       .getOrElse("")
 
   def patchUpdate(c: Version, updates: SortedSet[Version]): Option[Version] =
-    updates.filter { v =>
-      v.major == c.major && v.minor == c.minor
-    }.lastOption
+    updates.filter(v => v.major == c.major && v.minor == c.minor).lastOption
 
   def minorUpdate(c: Version, updates: SortedSet[Version]): Option[Version] =
-    updates.filter { v =>
-      v.major == c.major && v.minor > c.minor
-    }.lastOption
+    updates.filter(v => v.major == c.major && v.minor > c.minor).lastOption
 
   def majorUpdate(c: Version, updates: SortedSet[Version]): Option[Version] =
-    updates.filter { v =>
-      v.major > c.major
-    }.lastOption
+    updates.filter(v => v.major > c.major).lastOption
 
   def readUpdates(data: Map[ModuleID, SortedSet[Version]]): List[DependencyUpdate] =
     data

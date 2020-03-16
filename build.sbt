@@ -1,10 +1,9 @@
 pgpPassphrase := Some(getEnvVar("PGP_PASSPHRASE").getOrElse("").toCharArray)
-pgpPublicRing := file(s"$gpgFolder/pubring.gpg")
-pgpSecretRing := file(s"$gpgFolder/secring.gpg")
 
 lazy val `sbt-dependencies` = (project in file("."))
   .settings(moduleName := "sbt-dependencies")
   .settings(pluginSettings: _*)
+  .enablePlugins(SbtPlugin)
 
 lazy val docs = (project in file("docs"))
   .settings(moduleName := "docs")
